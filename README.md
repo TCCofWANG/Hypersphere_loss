@@ -1,0 +1,8 @@
+# Image Classification on Hypersphere Loss
+
+A deep learning-based image classification algorithm generally comprises two crucial components: a feature learning module and a classification module. The former is responsible for converting an image into the corresponding low-dimensional feature vector, while the latter is tasked with classifying the image based on the feature vector.
+The performance of the image classification system is determined jointly by both these modules. In addition, whether the feature learning module can obtain distinguishing features will also be affected by the loss function in the classification module.
+This paper introduces a novel hypersphere loss function, which enhances the intra-class compactness and inter-class separability of feature vectors. Additionally, a new generalized class center is proposed to handle the inevitable variability (e.g., illumination, background, blurriness, low resolution, etc.) in samples of the same class. 
+To optimize the weight parameters and class centers, we depart from the conventional stochastic gradient descent (SGD) approach and instead employ an alternative learning strategy. Specifically, we first fix the weight parameters of the deep learning model and calculate class centers using the exponentially weighted moving average (EWMA) method.
+Then, we fix the generalized class centers and update the weight parameters using mini-batch SGD. The proposed algorithm is evaluated on several standard image classification and face verification tasks.
+The results demonstrate that our proposed algorithm outperforms several state-of-the-art approaches.
