@@ -93,35 +93,12 @@ def get_center_momentum(im, label, Structure, nCenter, Num_center, sep_weight=0.
              for j in range(class_num):
                  Center[j]+=sum(C_feat[label==j])
         else:
-            # v= beta*nCenter[label]+(1-beta)*C_feat
-            # v= 1/(1-beta**Num_center)*(beta*nCenter[label]+(1-beta)*C_feat)
             centers=radius*nCenter
             v= beta*centers[label]+(1-beta)*C_feat
-            # v= 1/(1-beta**Num_center)*(beta*centers[label]+(1-beta)*C_feat)
-            # CenterMean = (torch.sum(nCenter,dim=0)-nCenter)/(class_num-1)
-            
             CenterMean = (torch.sum(centers,dim=0)-centers)/(class_num-1)
-            # weight_centers = Structure[1].weight
-            # CenterMean = (torch.sum(weight_centers,dim=0)-weight_centers)/(class_num-1)
-            
-            ## Center calculate v1: 
-            # for i in range(len(label)):
-            #     for j in range(class_num):
-            #         if label[i]==j:
-            #             labelNum[j]+=1
-            #             Center[j]+=v[i]
-                        
-            ## Center calculate v2:
+
             for j in range(class_num):
-                # Center[j]+=sum(v[label==j])
                 Center[j]+=torch.sum(v[label==j]-sep_weight*CenterMean[j],dim=0)
-                # labelNum[j]+=len(index[label==j])
-                # A = torch.cat((nCenter[:j, :], nCenter[j+1:, :]), dim=0)
-                # Center[j]+=torch.sum(v[label==j]-sep_weight*(torch.matmul(
-                #     torch.matmul(C_feat[label==j],torch.transpose(A, 0, 1)),A)),dim=0)
-            # Center=Center/labelNum.reshape((class_num,1))
-    
-            # Center = Center-sep_weight*CenterMean
         
         nCenter = Center.renorm(2,0,1e-5).mul(1e5)
         
@@ -144,26 +121,6 @@ class SoftmaxLoss(nn.Module):
         softmaxLoss = F.cross_entropy(out, label) 
         # the cross_entropy here is equal to softmax+NNL (realy cross entropy)
         return out, softmaxLoss
-    
-# class CenterLoss(nn.Module):
-#     def __init__(self, feat_dim, class_num, loss_weight=0.1):
-#         super(CenterLoss, self).__init__()
-#         self.weight = nn.Parameter(10 * torch.randn(class_num, feat_dim))
-#         self.center = nn.Parameter(10 * torch.randn(class_num, feat_dim))
-#         self.loss_weight = loss_weight
-#         self.loss = nn.MSELoss()
-#         nn.init.xavier_uniform_(self.weight)
-#         nn.init.xavier_uniform_(self.center)
-
-#     def forward(self, feature, label):
-#         # nweight = self.weight
-#         nweight = self.weight.renorm(2,0,1e-5).mul(1e5) #standardization 
-#         # nfeature = self.feature.renorm(2,0,1e-5).mul(1e5)
-#         center = self.center[label].to(device)
-#         centerloss = 0.5* self.loss(feature, center)
-#         out = torch.matmul(feature, torch.transpose(nweight, 0, 1).to(device))
-#         ceLoss = F.cross_entropy(out, label)
-#         return out, ceLoss + self.loss_weight * centerloss
 
 class gCL(nn.Module):
     # generaliezed Center Loss
