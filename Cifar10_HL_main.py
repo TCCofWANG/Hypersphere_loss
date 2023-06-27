@@ -139,8 +139,8 @@ class gCL(nn.Module):
         dists = torch.norm(feat-scenter[label], p=2, dim=1, keepdim=False)
         
         thres = alpha*rho
-        indicate = torch.where(1*dists > thres,1,0)
-        indicate1 = torch.where((1*dists > thres) & (1*dists <= 2*thres),1,0)
+        indicate = 1*dists
+        indicate1 = torch.where(indicate > thres,1,0)
         
         # 截断式空间域一般类中心
         gCLloss = self.loss_weight*(torch.sum((indicate*dists)**2)/(2*feat.numel()))
