@@ -27,7 +27,7 @@ import datetime
 from models import *
 from utils import *
 
-# In[]: Hyper parameters
+# In[]: Hyperparameters
 data_name = 'CIFAR10'
 loss_name = 'HL'
 model_name = 'ResNet18'
@@ -39,7 +39,7 @@ stard_seed = 6
 total_seed = 6
 radius = 40
 alpha = 0.998*radius
-rho = 0.5  #和CCL2中rho的含义不同，这里是指一般化中心半径占其理论最大半径的比例
+rho = 0.05  #和CCL2中rho的含义不同，这里是指一般化中心半径占其理论最大半径的比例
 loss_weight = 0.002   # constrainted_center_loss前的权重
 sep_weight = 0.1    # 不同类别center分离乘法项的权重
 Center_step = 1   # 每隔多少步进行一次center更新
@@ -140,10 +140,10 @@ class gCL(nn.Module):
         
         thres = alpha*rho
         indicate = 1*dists
-        indicate1 = torch.where(indicate > thres,1,0)
+        indicate1 = torch.where(indicate > thres,1,0)*indicate
         
         # 截断式空间域一般类中心
-        gCLloss = self.loss_weight*(torch.sum((indicate*dists)**2)/(2*feat.numel()))
+        gCLloss = self.loss_weight*(torch.sum((indicate1*dists)**2)/(2*feat.numel()))
             # +sep_weight*torch.sum(CenterMean[label]*normalized_feat)/label.shape[0])
         
         """渐进式类中心参数准备"""
